@@ -26,5 +26,5 @@ env:
 # Health check configuration
 healthCheck:
   enabled: true
-  path: /
+  path: /health
   port: 5000

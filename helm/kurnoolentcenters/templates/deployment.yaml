@@ -4,7 +4,7 @@ metadata:
   name: {{ .Chart.Name }}
   labels:
     app: {{ .Chart.Name }}
-    version: {{ .Chart.AppVersion }}
+    version: "{{ .Chart.AppVersion }}"
 spec:
   replicas: {{ .Values.deployment.replicas }}
   selector:
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: {{ .Chart.Name }}
-        version: {{ .Chart.AppVersion }}
+        version: "{{ .Chart.AppVersion }}"
     spec:
       containers:
       - name: {{ .Chart.Name }}
