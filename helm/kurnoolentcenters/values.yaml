@@ -1,0 +1,30 @@
+image:
+  repository: kurnoolentcenters
+  tag: "v2.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+
+deployment:
+  replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Environment variables
+env:
+  FLASK_ENV: production
+  FLASK_DEBUG: "false"
+
+# Health check configuration
+healthCheck:
+  enabled: true
+  path: /
+  port: 5000

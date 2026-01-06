@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    version: {{ .Chart.AppVersion }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        version: {{ .Chart.AppVersion }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 5000
+        env:
+        {{- range $key, $value := .Values.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.deployment.resources | nindent 10 }}
+        {{- if .Values.healthCheck.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.healthCheck.path }}
+            port: {{ .Values.healthCheck.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.healthCheck.path }}
+            port: {{ .Values.healthCheck.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        {{- end }}
