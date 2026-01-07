@@ -1,0 +1,96 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflared-creds
+  namespace: default
+type: Opaque
+data:
+  # Replace with base64 of your credentials.json
+  credentials.json: <BASE64_ENCODED_CREDENTIALS_JSON> /etc/cloudflared/16127e86-e4c2-4bd4-9d2e-383a93b7ea31.json
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflared-cert
+  namespace: default
+type: Opaque
+data:
+  # Replace with base64 of your cert.pem
+  cert.pem: <BASE64_ENCODED_CERT_PEM> /etc/cloudflared/cert.pem
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: default
+data:
+  config.yml: |
+    tunnel: 16127e86-e4c2-4bd4-9d2e-383a93b7ea31
+    credentials-file: /etc/cloudflared/credentials.json
+    origincert: /etc/cloudflared/cert.pem
+
+    ingress:
+      - hostname: kurnoolentcenters.com
+        service: http://kurnoolentcenters.default.svc.cluster.local:80
+          #service: http://traefik.kube-system.svc.cluster.local:80
+      - service: http_status:404
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+      - name: cloudflared
+        image: cloudflare/cloudflared:latest
+        args:
+          - tunnel
+          - run
+        volumeMounts:
+          - name: cloudflared-volume
+            mountPath: /etc/cloudflared
+            readOnly: true
+      volumes:
+        - name: cloudflared-volume
+          projected:
+            sources:
+              - configMap:
+                  name: cloudflared-config
+                  items:
+                    - key: config.yml
+                      path: config.yml
+              - secret:
+                  name: cloudflared-creds
+                  items:
+                    - key: credentials.json
+                      path: credentials.json
+              - secret:
+                  name: cloudflared-cert
+                  items:
+                    - key: cert.pem
+                      path: cert.pem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: cloudflared
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
