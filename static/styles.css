@@ -258,6 +258,19 @@ footer {
   color: black;
 }
 
+/* Doctor name and designation styling */
+.doctor-name {
+  font-size: 1.2rem;
+  color: black;
+}
+
+.doctor-designation {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #666;
+  margin-left: 5px;
+}
+
 .footer-bottom {
   border-top: 1px solid #455a64;
   padding-top: 1rem;
