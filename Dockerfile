@@ -1,18 +1,31 @@
 # Multi-stage build to handle environments without internet access
-FROM python:3.14-slim as builder
+FROM debian:bookworm-slim as builder
+
+# Install Python and pip
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PATH="/home/appuser/.local/bin:$PATH"
 
 WORKDIR /build
 
 # Copy requirements and install packages in builder stage
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip3 install --no-cache-dir --user -r requirements.txt
 
 # Production stage
-FROM python:3.14-slim
+FROM debian:bookworm-slim
+
+# Install Python and pip
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -31,6 +44,9 @@ RUN chown -R appuser:appuser /home/appuser/.local
 
 # Copy application code
 COPY --chown=appuser:appuser . .
+
+# Ensure static files are properly copied and accessible
+RUN chown -R appuser:appuser /app/static
 
 # Create non-root user
 USER appuser
