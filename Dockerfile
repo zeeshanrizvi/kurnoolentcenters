@@ -5,6 +5,7 @@ FROM debian:bookworm-slim as builder
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
@@ -16,7 +17,9 @@ WORKDIR /build
 
 # Copy requirements and install packages in builder stage
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir --user -r requirements.txt
+RUN python3 -m venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Production stage
 FROM debian:bookworm-slim
@@ -25,22 +28,23 @@ FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_ENV=production
-ENV PATH="/home/appuser/.local/bin:$PATH"
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Create app user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 WORKDIR /app
 
-# Copy installed packages from builder stage
-COPY --from=builder /root/.local /home/appuser/.local
-RUN chown -R appuser:appuser /home/appuser/.local
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+RUN chown -R appuser:appuser /opt/venv
 
 # Copy application code
 COPY --chown=appuser:appuser . .
