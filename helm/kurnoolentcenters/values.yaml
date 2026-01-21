@@ -1,6 +1,6 @@
 image:
   repository: kurnoolentcenters
-  tag: "v2.0"
+  tag: "v3.0"
   pullPolicy: IfNotPresent
 
 service:
