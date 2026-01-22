@@ -307,8 +307,8 @@ footer {
 .instagram-link {
   background-color: transparent !important;
   box-shadow: none !important;
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
 }
 
 .instagram-link:hover {
@@ -321,8 +321,8 @@ footer {
 .youtube-link {
   background-color: transparent !important;
   box-shadow: none !important;
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
 }
 
 .youtube-link:hover {
@@ -332,11 +332,12 @@ footer {
 }
 
 .social-icon {
-  width: 100%;
-  height: 100%;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
   border-radius: 50%;
   transition: var(--transition);
+  display: block;
 }
 
 .instagram-link:hover .social-icon,
