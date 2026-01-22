@@ -340,6 +340,24 @@ footer {
   display: block;
 }
 
+/* Chrome-specific fixes for icon sizing consistency */
+@supports (-webkit-appearance: none) or (stroke-color: black) {
+  .social-icon {
+    max-width: 32px;
+    max-height: 32px;
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .instagram-link .social-icon,
+  .youtube-link .social-icon {
+    width: 32px !important;
+    height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+  }
+}
+
 .instagram-link:hover .social-icon,
 .youtube-link:hover .social-icon {
   transform: scale(1.1);
